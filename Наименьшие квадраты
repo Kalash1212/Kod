@@ -1,0 +1,139 @@
+import numpy as np
+from numpy import linalg as la
+
+I=int(input('Введите количество элементов: '))
+A=[0]*I
+B=[0]*I
+for i in range(I):
+    A[i]=float(input('Введите X'+str(i)+': '))
+for i in range(I):
+    B[i]=float(input('Введите Y'+str(i)+': '))
+print('Ваши значения: ')
+print(A)
+print(B,'\n')
+
+def stepen(A,Q):
+    c=0
+    for j in A:
+        c+= j**Q
+    return c
+
+def stepenY(A,B,Q):
+    c=0
+    k=0
+    for j in A:
+        c+= (j**Q)*B[k]
+        k+=1
+    return c
+# Ниже идут функции вычесляющие детерменанты для метода Крамера:
+def detC1():
+    S = np.array([C[0][0],C[1][0],C[2][0]])
+    for i in range(3):
+        C[i][0]=Y[i][0]
+    detC=la.det(C)
+    for i in range(3):
+        C[i][0]=S[i]
+    return detC
+
+def detC2():
+    S = np.array([C[0][1],C[1][1],C[2][1]])
+    for i in range(3):
+        C[i][1]=Y[i][0]
+    detC=la.det(C)
+    for i in range(3):
+        C[i][1]=S[i]
+    return detC
+
+def detC3():
+    S = np.array([C[0][2],C[1][2],C[2][2]])
+    for i in range(3):
+        C[i][2]=Y[i][0]
+    detC=la.det(C)
+    for i in range(3):
+        C[i][2]=S[i]
+    return detC
+
+def detG1():
+    S = np.array([G[0][0],G[1][0]])
+    for i in range(2):
+        G[i][0]=H[i][0]
+    detG=la.det(G)
+    for i in range(2):
+        G[i][0]=S[i]
+    return detG
+
+def detG2():
+    S = np.array([G[0][1],G[1][1]])
+    for i in range(2):
+        G[i][1]=H[i][0]
+    detG=la.det(G)
+    for i in range(2):
+        G[i][1]=S[i]
+    return detG
+#Линейная апроксимация:
+G = np.zeros((2, 2), dtype=np.float64)
+q=-1
+for k in range(2):
+    Q=q
+    for i in range(2):
+        Q+=1
+        G[k][i]=stepen(A,Q)
+    q+=1
+print('\n',G,'\n')
+H = np.zeros((2, 1), dtype=np.float64)
+for i in range(2):
+    H[i][0]=stepenY(A,B,i)
+print(H,'\n')
+# Методом Крамера находим коэфициенты:
+det=round(la.det(G),3)
+a1=round(detG1(),3)/det
+a2=round(detG2(),3)/det
+if a1>0:
+    print('Многочлен будет выглядеть так: ', end='',)
+    print(round(a2,2),'*X+',round(a1,2),'\n',sep='')
+else: 
+    print('Многочлен будет выглядеть так: ', end='')
+    print(round(a2,2),'*X',round(a1,2),'\n',sep='')
+F=0
+t=0
+for i in A:
+    F+=(a2*i+a1-B[t])**2
+    t+=1
+print('Точность Ф: ', F,'\n')
+# Квадратичная апроксимация:
+C = np.zeros((3, 3), dtype=np.float64)
+q=-1
+for k in range(3):
+    Q=q
+    for i in range(3):
+        Q+=1
+        C[k][i]=stepen(A,Q)
+    q+=1
+print(C,'\n')
+Y = np.zeros((3, 1), dtype=np.float64)
+for i in range(3):
+    Y[i][0]=stepenY(A,B,i)
+print(Y,'\n')
+# Методом Крамера находим коэфициенты:
+det=round(la.det(C),3)
+a1=round(detC1(),3)/det
+a2=round(detC2(),3)/det
+a3=round(detC3(),3)/det
+if a2>0 and a1>0:
+    print('Квадратичный многочлен будет выглядеть так: ', end='')
+    print(round(a3,2),'*X^2+',round(a2,2),'*X+',round(a1,2),sep='')
+elif a2>0 and a1<0:
+    print('Квадратичный многочлен будет выглядеть так: ', end='')
+    print(round(a3,2),'*X^2+',round(a2,2),'*X',round(a1,2),sep='')
+elif a2<0 and a1>0:
+    print('Квадратичный многочлен будет выглядеть так: ', end='')
+    print(round(a3,2),'*X^2',round(a2,2),'*X+',round(a1,2),sep='')
+else:
+    print('Квадратичный многочлен будет выглядеть так: ', end='')
+    print(round(a3,2),'*X^2 ',round(a2,2),'*X ',round(a1,2),sep='')
+F=0
+t=0
+for i in A:
+    F+=(a3*(i**2)+a2*i+a1-B[t])**2
+    t+=1
+print('Точность Ф: ', F,'\n')

@@ -1,0 +1,78 @@
+import numpy as np
+import math as ma
+def maximal(A):
+    ind1=abs(A[0][1])
+    ind2=abs(A[0][2])
+    ind3=abs(A[1][2])
+    if ind1>ind2 and ind1>ind3:
+        return A[0][1],1
+    elif ind2>ind1 and ind2>ind3:
+        return A[0][2],2
+    else:
+        return A[1][2],3
+n=3
+A = np.zeros((n, n), dtype=np.float64)
+for i in range (n):
+    for j in range(n):
+        A[i][j]=float(input('Введите элемент матрицы: '))
+print('Ваша матрица:', '\n', A)
+if A[0][1]==A[1][0] and A[0][2]==A[2][0] and A[1][2]==A[2][1]:
+    E=float(input('Введите точность: '))
+    print('Ваша точность:', E)
+    k=0
+    while ma.sqrt(A[0][1]**2+A[0][2]**2+A[1][2]**2)>E:
+        x,ind=maximal(A)
+        print(ma.sqrt(A[0][1]**2+A[0][2]**2+A[1][2]**2),'>', E, 'поэтому выполняем итерацию.')
+        print('Максимальный недиагональный элемент:', x)
+        if ind==1:
+            U = np.zeros((n, n), dtype=np.float64)
+            f=0.5*ma.atan(2*x/(A[0][0]-A[1][1]))
+            print('Угол:', f)
+            U[0][0]=ma.cos(f)
+            U[0][1]=-ma.sin(f)
+            U[1][0]=ma.sin(f)
+            U[1][1]=ma.cos(f)
+            U[2][2]=1
+        elif ind==2:
+            U = np.zeros((n, n), dtype=np.float64)
+            f=0.5*ma.atan(2*x/(A[0][0]-A[2][2]))
+            print('Угол:', f)
+            U[0][0]=ma.cos(f)
+            U[0][2]=-ma.sin(f)
+            U[1][1]=1
+            U[2][0]=ma.sin(f)
+            U[2][2]=ma.cos(f)
+        elif ind==3:
+            U = np.zeros((n, n), dtype=np.float64)
+            f=0.5*ma.atan(2*x/(A[1][1]-A[2][2]))
+            print('Угол:', f)
+            U[0][0]=1
+            U[1][1]=ma.cos(f)
+            U[1][2]=-ma.sin(f)
+            U[2][1]=ma.sin(f)
+            U[2][2]=ma.cos(f)
+        print('Матрица вращения: ','\n', U)
+        Ut=np.transpose(U)
+        print('Транспонированная матрица:', '\n', Ut)
+        print('Итерация №', k+1 )
+        A=np.dot(np.dot(Ut,A),U)
+        print(A)
+        if k==0:
+            X=U
+        else:
+            X=np.dot(X,U)
+        k+=1
+    x,ind=maximal(A)
+    print(x,'<',E)
+    print('Собственные значения:')
+    print('λ1=', round(A[0][0],6))
+    print('λ2=', round(A[1][1],10))
+    print('λ3=', round(A[2][2],6), '\n')
+    print('Собственные вектора:')
+    for i in range(n):
+        print('X', i+1,'=',end='')
+        for j in range(n):
+            print('\t', round(X[j][i],4))
+        print('')    
+else:
+    print('Матрица не симметрична')

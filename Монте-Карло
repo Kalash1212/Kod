@@ -1,0 +1,24 @@
+import numpy as np
+import math
+import random
+print("Здравствуйте, эта программа помогает найти определенный интеграл с заданной точностью методом Монте-карло.")
+print("Интеграл: ∫ exp(x^2) dx")
+a = float(input("Введите нижнюю границу a: "))
+b = float(input("Введите верхнюю границу b: "))
+N = float(input("Введите количество точек N = "))
+print("********************************************************************************************")
+yb = np.exp(b*b)
+Skv = (b - a) * yb
+print("Площадь квадрата S =", Skv)
+i = 0
+K = 0
+while i < N:
+    i = i+1
+    x = random.uniform(a, b)
+    y = random.uniform(0, yb)
+    f = np.exp(x*x)
+    if y < f:
+        K = K+1
+print("Количество точек попавших под кривую K =", K)
+I = (Skv * K)/ N
+print("I = (S * K)/ N =", I)
